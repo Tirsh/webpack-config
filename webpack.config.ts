@@ -1,51 +1,28 @@
-import path from 'path';
 import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import type { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import {buildWebpackConfig} from "./config/build/buildWebpackConfig";
+import {BuildEnv, BuildPaths} from "./config/build/types/config";
+import path from "path";
 
-type Mode = 'development' | 'production';
 
-interface EnvVariables {
-  mode: Mode,
-  port: number,
+export default (env: BuildEnv) => {
 
-}  
 
-export default (env:EnvVariables) => {
+    const paths: BuildPaths = {
+        entry: path.resolve(__dirname, 'src', 'index.ts'),
+        build: path.resolve(__dirname, 'build'),
+        html: path.resolve(__dirname, 'public', 'index.html'),
+    }
 
-  const isDev = env.mode === 'development';
+    const mode = env.mode || 'development';
+    const isDev = mode === 'development';
+    const PORT = env.port || 3000;
 
-  const config: webpack.Configuration = {
-      mode: env.mode ?? 'development',
-      entry: path.resolve(__dirname, 'src', 'index.ts'),  
-      output: {
-          path: path.resolve(__dirname, 'build'),
-          filename: '[name].[contenthash].js',
-          clean: true,
-      },
-      
-      module: {
-          rules: [
-            {
-              test: /\.tsx?$/,
-              use: 'ts-loader',
-              exclude: /node_modules/,
-            },
-          ],
-        },
-        resolve: {
-          extensions: ['.tsx', '.ts', '.js'],
-        },
-      devtool: isDev ? 'inline-source-map' : false,
-      devServer: isDev ? {
-        port: env.port ?? 3500,
-        open: true
-      }: undefined,
+    const config: webpack.Configuration = buildWebpackConfig({
+        mode,
+        paths,
+        isDev,
+        port: PORT,
+    })
 
-      plugins: [
-          new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public', 'index.html')}),
-          new webpack.ProgressPlugin(),
-      ],
-  }
-  return config;
-}
+    return config;
+};
