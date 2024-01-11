@@ -3,8 +3,14 @@
   height: var(--navbar-height);
   background: var(--inverted-bg-color);
   display: flex;
-  justify-content: end;
-  gap: 20px;
   align-items: center;
   padding: 20px;
+}
+
+.links {
+  margin-left: auto;
+}
+
+.mainLink {
+  margin-right: 15px;
 }
